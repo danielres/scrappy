@@ -7,6 +7,7 @@ import juice from 'juice'
 import { fileURLToPath } from 'url'
 
 const { XLSX_OUT, EMAIL_TEMPLATE } = process.env
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -45,4 +46,14 @@ rows.forEach((row) => {
 
   // Output final HTML
   console.log(finalHtml)
+  const sanitized = sanitizeFilename(row.name).slice(0, 100)
+  // fs.writeFileSync(`emails/${sanitized}.html`, finalHtml)
 })
+
+function sanitizeFilename(str) {
+  return str
+    .trim()
+    .normalize('NFD') // Normalize to decompose diacritics
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritic marks
+    .replace(/[^a-zA-Z0-9 ._-]/g, '') // Keep only filename-safe characters
+}
