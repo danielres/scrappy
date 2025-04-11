@@ -15,7 +15,7 @@ const data = {
   link: 'https://example.com',
 }
 
-const templatePath = path.join(__dirname, '../templates/test.md')
+const templatePath = path.join(__dirname, '../templates/example.md')
 const templateSrc = fs.readFileSync(templatePath, 'utf-8')
 
 // Step 1: Inject data with handlebars
