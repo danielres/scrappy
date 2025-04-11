@@ -1,11 +1,10 @@
-import type { Row } from './types.ts'
-
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 import xlsx from 'xlsx'
 import { isMainThread } from 'worker_threads'
+import config from '../config.ts'
 
-const { XLSX_IN, XLSX_OUT } = process.env
+const { XLSX_IN, XLSX_OUT } = config
 
 if (!XLSX_IN) throw 'XLSX_IN is not defined'
 if (!XLSX_OUT) throw 'XLSX_OUT is not defined'
@@ -63,7 +62,7 @@ async function processOrganization(orgName: string, orgUrl: string) {
   return { contactPage, emails, phones, lang }
 }
 
-async function processRow(row: Row, headers) {
+async function processRow(row, headers) {
   console.log(row)
   const skip =
     (row[headers['skip?']] || '').toString().trim().toUpperCase() === 'TRUE'

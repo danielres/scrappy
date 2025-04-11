@@ -1,10 +1,8 @@
 import { getRows } from './utils/sheet.ts'
 import { renderData } from './utils/template.ts'
+import config from '../config.ts'
 
-const { XLSX_OUT, EMAIL_TEMPLATE } = process.env
-
-if (!XLSX_OUT) throw 'XLSX_OUT is not defined'
-if (!EMAIL_TEMPLATE) throw 'EMAIL_TEMPLATE  is not defined'
+const { XLSX_OUT, EMAIL_TEMPLATE } = config
 
 const rows = getRows(XLSX_OUT)
 
