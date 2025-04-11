@@ -1,14 +1,10 @@
-const axios = require('axios')
-const cheerio = require('cheerio')
-const { parse } = require('url')
-const fs = require('fs')
-const xlsx = require('xlsx')
-const {
-  Worker,
-  isMainThread,
-  parentPort,
-  workerData,
-} = require('worker_threads')
+import axios from 'axios'
+import * as cheerio from 'cheerio'
+import { parse } from 'url'
+import fs from 'fs'
+import xlsx from 'xlsx'
+import { Worker, isMainThread, parentPort, workerData } from 'worker_threads'
+
 const { XLSX_IN, XLSX_OUT } = process.env
 
 async function getContactLinks(baseUrl) {

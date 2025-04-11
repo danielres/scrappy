@@ -1,3 +1,4 @@
+import xlsx from 'xlsx'
 import fs from 'fs'
 import path from 'path'
 import Handlebars from 'handlebars'
@@ -8,26 +9,40 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Load data
-const data = {
-  name: 'Jack',
-  product: 'Potatoes',
-  link: 'https://example.com',
-}
+const { XLSX_OUT } = process.env
+const workbook = xlsx.readFile(XLSX_OUT)
+const sheetName = workbook.SheetNames[0]
+const sheet = workbook.Sheets[sheetName]
+const rows = xlsx.utils.sheet_to_json(sheet)
 
+// Load template
 const templatePath = path.join(__dirname, '../templates/example.md')
 const templateSrc = fs.readFileSync(templatePath, 'utf-8')
 
-// Step 1: Inject data with handlebars
+// Compile template
 const compiled = Handlebars.compile(templateSrc)
-const markdownWithData = compiled(data)
 
-// Step 2: Convert to HTML
-const md = new MarkdownIt()
-const html = md.render(markdownWithData)
+// Process each row
+rows.forEach((row) => {
+  const email = row.Emails.split('\n')[0]
+  const data = { ...row, email }
+  console.log('\n--------------------------------------------------')
+  console.log(
+    '== Available variables:\n',
+    '  ',
+    Object.keys(data).join(' | '),
+    '\n\n'
+  )
 
-// Step 3: Inline CSS for emails
-const finalHtml = juice(html)
-console.log(finalHtml)
-// Step 4: Write to file
-// fs.writeFileSync('output/email.html', finalHtml)
+  const markdownWithData = compiled(data)
+
+  // Step 2: Convert to HTML
+  const md = new MarkdownIt()
+  const html = md.render(markdownWithData)
+
+  // Step 3: Inline CSS for emails
+  const finalHtml = juice(html)
+
+  // Output final HTML
+  console.log(finalHtml)
+})
