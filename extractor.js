@@ -10,6 +10,7 @@ const {
   workerData,
 } = require('worker_threads')
 const { XLSX_IN, XLSX_OUT } = process.env
+
 async function getContactLinks(baseUrl) {
   try {
     const response = await axios.get(baseUrl, { timeout: 10000 })
@@ -35,11 +36,13 @@ async function extractTextFromUrl(url) {
   try {
     const response = await axios.get(url, { timeout: 10000 })
     const $ = cheerio.load(response.data)
+    const lang = $('html').attr('lang') || 'unknown'
     $('script, style').remove()
-    return $('body').text().replace(/\s+/g, ' ').trim()
+    const text = $('body').text().replace(/\s+/g, ' ').trim()
+    return { text, lang }
   } catch (error) {
     console.error(`Error scraping ${url}: ${error.message}`)
-    return ''
+    return { text: '', lang: 'unknown' }
   }
 }
 
@@ -56,9 +59,9 @@ async function processOrganization(orgName, orgUrl) {
   const contactPages = await getContactLinks(orgUrl)
   const contactPage = contactPages[0] || orgUrl
   console.log(`→ Contact page: ${contactPage}`)
-  const text = await extractTextFromUrl(contactPage)
+  const { text, lang } = await extractTextFromUrl(contactPage)
   const { emails, phones } = extractContacts(text)
-  return { contactPage, emails, phones }
+  return { contactPage, emails, phones, lang }
 }
 
 async function processRow(row, headers) {
@@ -82,6 +85,7 @@ async function processRow(row, headers) {
   row[headers['contact']] = info.contactPage
   row[headers['emails']] = info.emails.join('\n')
   row[headers['phones']] = info.phones.join('\n')
+  row[headers['language']] = info.lang
   row[headers['skip?']] = 'TRUE'
   console.log(`✅ Processed: ${orgName}`)
   return row
