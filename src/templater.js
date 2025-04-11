@@ -6,17 +6,17 @@ import MarkdownIt from 'markdown-it'
 import juice from 'juice'
 import { fileURLToPath } from 'url'
 
+const { XLSX_OUT, EMAIL_TEMPLATE } = process.env
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const { XLSX_OUT } = process.env
 const workbook = xlsx.readFile(XLSX_OUT)
 const sheetName = workbook.SheetNames[0]
 const sheet = workbook.Sheets[sheetName]
 const rows = xlsx.utils.sheet_to_json(sheet)
 
 // Load template
-const templatePath = path.join(__dirname, '../templates/example.md')
+const templatePath = `templates/${EMAIL_TEMPLATE}`
 const templateSrc = fs.readFileSync(templatePath, 'utf-8')
 
 // Compile template
