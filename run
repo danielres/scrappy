@@ -11,7 +11,7 @@ echo "organizations.xlsx has been reset to unprocessed state"
 
 echo "==================================="
 
-node ./src/extractor.js
+node ./src/extractor.ts
 
 echo "==================================="
 

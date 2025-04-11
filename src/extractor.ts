@@ -1,13 +1,16 @@
+import type { Row } from './types.ts'
+
 import axios from 'axios'
 import * as cheerio from 'cheerio'
-import { parse } from 'url'
-import fs from 'fs'
 import xlsx from 'xlsx'
-import { Worker, isMainThread, parentPort, workerData } from 'worker_threads'
+import { isMainThread } from 'worker_threads'
 
 const { XLSX_IN, XLSX_OUT } = process.env
 
-async function getContactLinks(baseUrl) {
+if (!XLSX_IN) throw 'XLSX_IN is not defined'
+if (!XLSX_OUT) throw 'XLSX_OUT is not defined'
+
+async function getContactLinks(baseUrl: string) {
   try {
     const response = await axios.get(baseUrl, { timeout: 10000 })
     const $ = cheerio.load(response.data)
@@ -28,7 +31,7 @@ async function getContactLinks(baseUrl) {
   }
 }
 
-async function extractTextFromUrl(url) {
+async function extractTextFromUrl(url: string) {
   try {
     const response = await axios.get(url, { timeout: 10000 })
     const $ = cheerio.load(response.data)
@@ -42,7 +45,7 @@ async function extractTextFromUrl(url) {
   }
 }
 
-function extractContacts(text) {
+function extractContacts(text: string) {
   const emailRegex = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g
   const phoneRegex = /\+?\d[\d\s\-()]{8,}\d/g
   const emails = [...new Set(text.match(emailRegex) || [])]
@@ -50,7 +53,7 @@ function extractContacts(text) {
   return { emails, phones }
 }
 
-async function processOrganization(orgName, orgUrl) {
+async function processOrganization(orgName: string, orgUrl: string) {
   console.log(`\n🔍 Processing: ${orgName} (${orgUrl})`)
   const contactPages = await getContactLinks(orgUrl)
   const contactPage = contactPages[0] || orgUrl
@@ -60,7 +63,7 @@ async function processOrganization(orgName, orgUrl) {
   return { contactPage, emails, phones, lang }
 }
 
-async function processRow(row, headers) {
+async function processRow(row: Row, headers) {
   console.log(row)
   const skip =
     (row[headers['skip?']] || '').toString().trim().toUpperCase() === 'TRUE'
@@ -92,12 +95,14 @@ if (isMainThread) {
     const workbook = xlsx.readFile(XLSX_IN)
     const sheetName = workbook.SheetNames[0]
     const sheet = workbook.Sheets[sheetName]
-    const rows = xlsx.utils.sheet_to_json(sheet, { header: 1 })
+    const rows: any[][] = xlsx.utils.sheet_to_json(sheet, { header: 1 })
 
     const headers = rows[0].reduce((acc, header, idx) => {
       acc[header.toLowerCase()] = idx
       return acc
     }, {})
+
+    console.log(rows)
 
     const tasks = rows.slice(1).map((row, idx) => ({
       row,

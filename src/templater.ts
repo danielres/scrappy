@@ -1,21 +1,21 @@
+import type { Row } from './types.ts'
+
 import xlsx from 'xlsx'
 import fs from 'fs'
-import path from 'path'
 import Handlebars from 'handlebars'
 import MarkdownIt from 'markdown-it'
 import juice from 'juice'
-import { fileURLToPath } from 'url'
+import { sanitizeFilename } from './utils/sanitizeFilename.ts'
 
 const { XLSX_OUT, EMAIL_TEMPLATE } = process.env
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+if (!XLSX_OUT) throw 'XLSX_OUT is not defined'
+if (!EMAIL_TEMPLATE) throw 'EMAIL_TEMPLATE  is not defined'
 
 const workbook = xlsx.readFile(XLSX_OUT)
 const sheetName = workbook.SheetNames[0]
 const sheet = workbook.Sheets[sheetName]
-const rows = xlsx.utils.sheet_to_json(sheet)
-
+const rows = xlsx.utils.sheet_to_json(sheet) as Row[]
 // Load template
 const templatePath = `templates/${EMAIL_TEMPLATE}`
 const templateSrc = fs.readFileSync(templatePath, 'utf-8')
@@ -49,11 +49,3 @@ rows.forEach((row) => {
   const sanitized = sanitizeFilename(row.name).slice(0, 100)
   // fs.writeFileSync(`emails/${sanitized}.html`, finalHtml)
 })
-
-function sanitizeFilename(str) {
-  return str
-    .trim()
-    .normalize('NFD') // Normalize to decompose diacritics
-    .replace(/[\u0300-\u036f]/g, '') // Remove diacritic marks
-    .replace(/[^a-zA-Z0-9 ._-]/g, '') // Keep only filename-safe characters
-}
