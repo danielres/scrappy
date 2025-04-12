@@ -5,10 +5,11 @@ import MarkdownIt from 'markdown-it'
 import juice from 'juice'
 import path from 'path'
 
-type NamedText = { name: string; body: string }
+type NamedText = { id: number; name: string; body: string }
 
 export function rowsToHtmls(template: string, rows: Row[]): NamedText[] {
   return rows.map((data) => ({
+    id: data.id,
     name: data.name,
     body: dataToHtml(template, data),
   }))

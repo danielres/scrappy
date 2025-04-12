@@ -10,7 +10,7 @@ const dataSource = sheet.getRows()
 const template = config.EMAIL_TEMPLATE
 const htmls = rowsToHtmls(template, dataSource)
 
-htmls.forEach(({ name, body }) => {
-  const outputPath = saveFile(`emails/${name}.html`, body)
+htmls.forEach(({ id, name, body }) => {
+  const outputPath = saveFile(`emails/${id}-${name}.html`, body)
   console.log(`✅ Saved: ${outputPath}`)
 })

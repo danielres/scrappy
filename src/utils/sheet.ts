@@ -1,6 +1,7 @@
 import xlsx from 'xlsx'
 
 export type ColumnName =
+  | 'id'
   | 'skip?'
   | 'name'
   | 'url'
@@ -11,6 +12,7 @@ export type ColumnName =
   | 'language'
 
 export type Row = {
+  id: number
   skip: boolean
   name: string
   url: string
@@ -22,6 +24,7 @@ export type Row = {
 }
 
 export type AoaRow = [
+  Row['id'],
   Row['skip'],
   Row['name'],
   Row['url'],
