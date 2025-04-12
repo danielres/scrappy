@@ -2,6 +2,7 @@ import xlsx from 'xlsx'
 import { isMainThread } from 'worker_threads'
 import config from '../config.ts'
 import { getOrganizationData } from './utils/scraper.ts'
+import { Sheet } from './utils/sheet.ts'
 
 async function processRow(row, headers) {
   const skip =
@@ -32,10 +33,8 @@ async function processRow(row, headers) {
 
 if (isMainThread) {
   ;(async () => {
-    const workbook = xlsx.readFile(config.XLSX_IN)
-    const sheetName = workbook.SheetNames[0]
-    const sheet = workbook.Sheets[sheetName]
-    const rows: any[][] = xlsx.utils.sheet_to_json(sheet, { header: 1 })
+    const sheet = new Sheet(config.XLSX_IN)
+    const rows = sheet.getAoa()
 
     const headers = rows[0].reduce((acc, header, idx) => {
       acc[header.toLowerCase()] = idx
@@ -54,11 +53,9 @@ if (isMainThread) {
         return updatedRow
       })
     )
-
     const updatedRows = [rows[0], ...results]
-    const updatedSheet = xlsx.utils.aoa_to_sheet(updatedRows)
-    workbook.Sheets[sheetName] = updatedSheet
-    xlsx.writeFile(workbook, config.XLSX_OUT)
+    sheet.updateSheetWithAoa(updatedRows)
+    sheet.saveAs(config.XLSX_OUT)
     console.log('✅ Updates saved to ' + config.XLSX_OUT)
   })()
 }
