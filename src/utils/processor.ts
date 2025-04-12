@@ -3,32 +3,24 @@ import fs from 'fs'
 import Handlebars from 'handlebars'
 import MarkdownIt from 'markdown-it'
 import juice from 'juice'
+import path from 'path'
 
-type Doc = { name: string; body: string }
+type NamedText = { name: string; body: string }
 
-type Data = Row
-
-export function rowsToHtmls(template: string, rows: Row[]): Doc[] {
+export function rowsToHtmls(template: string, rows: Row[]): NamedText[] {
   return rows.map((data) => ({
     name: data.name,
     body: dataToHtml(template, data),
   }))
 }
 
-export function saveDocs(docs: Doc[], options = { folder: '', ext: '' }) {
-  console.log('')
-
-  docs.forEach(({ name, body }, idx: number) => {
-    const folder = options.folder || 'emails'
-    const ext = options.ext || 'html'
-    const sanitized = sanitizeFilename(name)
-    const dest = `${folder}/${sanitized}.${ext}`
-    fs.writeFileSync(dest, body)
-    console.log(`✅ ${idx + 1}/${docs.length} Saved: ${dest}`)
-  })
+export function saveFile(dest: string, body: string) {
+  const sanitizedFullPath = sanitizeFullPath(dest)
+  fs.writeFileSync(sanitizedFullPath, body)
+  return sanitizedFullPath
 }
 
-function dataToHtml(templateName: string, data: Data) {
+function dataToHtml(templateName: string, data: Row) {
   const templateSrc = fs.readFileSync(`templates/${templateName}`, 'utf-8')
   const md = Handlebars.compile(templateSrc)(data)
   const html = markdownToHtml(md)
@@ -42,10 +34,22 @@ function markdownToHtml(document: string) {
   return html
 }
 
-export function sanitizeFilename(str: string) {
+function sanitizeFullPath(fp: string) {
+  const parts = fp.split('/')
+  const path = parts.slice(0, -1).join('/') + '/'
+  const fileName = parts[parts.length - 1]
+  const sanitizedFileName = sanitizeFileName(fileName)
+  return path + sanitizedFileName
+}
+
+export function sanitizeFileName(str: string) {
   return str
     .trim()
     .normalize('NFD') // Normalize to decompose diacritics
     .replace(/[\u0300-\u036f]/g, '') // Remove diacritic marks
     .replace(/[^a-zA-Z0-9 ._-]/g, '') // Keep only filename-safe characters
+}
+
+export function getFileName(str: string) {
+  return path.basename(str)
 }
