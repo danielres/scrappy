@@ -10,5 +10,5 @@ const folder = 'emails'
 saveDocs(htmls, { folder, ext: 'html' })
 
 console.log(
-  `\n ✅ ${htmls.length} files generated successfully under "${folder}"`
+  `\n✅ ${htmls.length} files generated successfully under "${folder}"`
 )
