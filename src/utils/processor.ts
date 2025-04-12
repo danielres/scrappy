@@ -4,7 +4,8 @@ import Handlebars from 'handlebars'
 import MarkdownIt from 'markdown-it'
 import juice from 'juice'
 
-type Data = Record<string, string>
+type Data = Row
+
 export type Doc = { name: string; body: string }
 
 export function dataToHtml(templateName: string, data: Data) {

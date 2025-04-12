@@ -1,28 +1,31 @@
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 import config from '../../config.ts'
+import type { Row } from './sheet.ts'
 
-type ScrapeResult = { text: string; lang: string }
+type ScrapeResult = { text: string; language: string }
 
-export async function getOrganizationData(orgName: string, orgUrl: string) {
+export async function getOrgaData(
+  orgUrl: string
+): Promise<Partial<Row>> {
   const contactPageUrls = await getContactPageUrls(orgUrl)
   const contactPageUrl = contactPageUrls[0] || orgUrl
-  const { text, lang } = await scrape(contactPageUrl)
+  const { text, language } = await scrape(contactPageUrl)
   const { emails, phones } = extractEmailsAndPhones(text)
-  return { contactPage: contactPageUrl, emails, phones, lang }
+  return { contact: contactPageUrl, emails, phones, language }
 }
 
 async function scrape(url: string): Promise<ScrapeResult> {
   try {
     const response = await axios.get(url, { timeout: 10000 })
     const $ = cheerio.load(response.data)
-    const lang = $('html').attr('lang') || 'unknown'
+    const language = $('html').attr('lang') || 'unknown'
     $('script, style').remove()
     const text = $('body').text().replace(/\s+/g, ' ').trim()
-    return { text, lang }
+    return { text, language }
   } catch (error) {
     console.error(`Error scraping ${url}: ${error.message}`)
-    return { text: '', lang: 'unknown' }
+    return { text: '', language: 'unknown' }
   }
 }
 
