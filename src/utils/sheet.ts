@@ -1,16 +1,5 @@
 import xlsx from 'xlsx'
 
-export type ColumnName =
-  | 'id'
-  | 'skip?'
-  | 'name'
-  | 'url'
-  | 'contact'
-  | 'emails'
-  | 'email'
-  | 'phones'
-  | 'language'
-
 export type Row = {
   id: number
   skip: boolean
@@ -22,6 +11,8 @@ export type Row = {
   phones: string[]
   language: string
 }
+
+export type ColumnName = keyof Row
 
 export type AoaRow = [
   Row['id'],
