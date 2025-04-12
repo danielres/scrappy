@@ -99,7 +99,7 @@ export class Sheet {
     row: AoaRow,
     processorFn: (a: string) => Promise<Partial<Row>>
   ) {
-    const skip = this.getCellValue(row, 'skip?') as Row['skip']
+    const skip = this.getCellValue(row, 'skip') as Row['skip']
     const name = this.getCellValue(row, 'name') as Row['name']
     const url = this.getCellValue(row, 'url') as Row['url']
 
@@ -121,7 +121,7 @@ export class Sheet {
     this.updateCell(row, 'email', data.emails?.[0])
     this.updateCell(row, 'language', data.language)
     this.updateCell(row, 'phones', data.phones)
-    this.updateCell(row, 'skip?', 'TRUE')
+    this.updateCell(row, 'skip', 'TRUE')
     return row
   }
 
