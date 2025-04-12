@@ -10,7 +10,7 @@ export type ColumnName =
   | 'language'
 
 export type Row = {
-  skip: string
+  skip: boolean
   name: string
   url: string
   contact: string
@@ -57,6 +57,16 @@ export class Sheet {
     }, {} as HeadersIndexes)
   }
 
+  async updateEachRowWith(rowUpdateFn: (s: string) => Promise<Partial<Row>>) {
+    const [headerRow, ...dataRows] = this.getAoa()
+    const promises = dataRows.map((row: AoaRow) =>
+      this.processRow(row, rowUpdateFn)
+    )
+    const updatedDataRows = await Promise.all(promises)
+    const updatedRows: Aoa = [headerRow, ...updatedDataRows]
+    this.updateSheetWithAoa(updatedRows)
+  }
+
   getHeadersIndexes(): HeadersIndexes {
     return this.headersIndexes
   }
@@ -83,38 +93,46 @@ export class Sheet {
     row: AoaRow,
     processorFn: (a: string) => Promise<Partial<Row>>
   ) {
-    const skip =
-      (row[this.headers.indexOf('skip?')] || '')
-        .toString()
-        .trim()
-        .toUpperCase() === 'TRUE'
-
-    const orgName = (row[this.headers.indexOf('name')] || '').toString().trim()
-    const orgUrl = (row[this.headers.indexOf('url')] || '').toString().trim()
+    const skip = this.getCellValue(row, 'skip?') as Row['skip']
+    const name = this.getCellValue(row, 'name') as Row['name']
+    const url = this.getCellValue(row, 'url') as Row['url']
 
     if (skip) {
-      console.log(`⏭️  Skipping: ${orgName} (${orgUrl})`)
+      console.log(`⏭️  Skipping: ${name} (${url})`)
       return row
     }
 
-    if (!orgUrl) {
-      console.log(`⏭️  Skipping: ${orgName} (No URL provided)`)
+    if (!url) {
+      console.log(`⏭️  Skipping: ${name} (No URL provided)`)
       return row
     }
 
-    console.log(`🔨 Processing: ${orgName}`)
+    console.log(`🔨 Processing: ${name}`)
 
-    const data = await processorFn(orgUrl)
+    const data = await processorFn(url)
     this.updateCell(row, 'contact', data.contact)
-    this.updateCell(row, 'emails', data.emails?.join('\n'))
-    this.updateCell(row, 'phones', data.phones?.join('\n'))
-    this.updateCell(row, 'language', data.language)
+    this.updateCell(row, 'emails', data.emails)
+    this.updateCell(row, 'phones', data.phones)
     this.updateCell(row, 'skip?', 'TRUE')
-
     return row
   }
 
-  updateCell(row: AoaRow, position: ColumnName, data: string | undefined) {
-    row[this.headers.indexOf(position)] = data || ''
+  updateCell(
+    row: AoaRow,
+    position: ColumnName,
+    data?: boolean | string | string[]
+  ) {
+    if (Array.isArray(data)) {
+      row[this.headers.indexOf(position)] = data.join('\n')
+      return
+    }
+    row[this.headers.indexOf(position)] = data ?? ''
+  }
+
+  getCellValue(row: AoaRow, name: ColumnName) {
+    const value = row[this.headers.indexOf(name)]
+    if (typeof value === 'string') return value.trim()
+    if (Array.isArray(value)) return value.join('\n')
+    return value
   }
 }
