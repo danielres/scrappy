@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert'
-import { sanitizeFilename } from './sanitizeFilename.ts'
+import { sanitizeFilename } from './processor.ts'
 
 test('sanitizeFilename', async (t) => {
   t.test('handles diacritics', () => {

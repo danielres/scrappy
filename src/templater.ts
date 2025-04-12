@@ -1,16 +1,14 @@
-import { getRows } from './utils/sheet.ts'
-import { renderData } from './utils/template.ts'
+import { Sheet } from './utils/sheet.ts'
+import { saveDocs, rowsToHtmls } from './utils/processor.ts'
 import config from '../config.ts'
 
-const { XLSX_OUT, EMAIL_TEMPLATE } = config
+const template = config.EMAIL_TEMPLATE
+const sheet = new Sheet(config.XLSX_OUT)
+const rows = sheet.getRows()
+const htmls = rowsToHtmls(template, rows)
+const folder = 'emails'
+saveDocs(htmls, { folder, ext: 'html' })
 
-const rows = getRows(XLSX_OUT)
-
-rows.forEach((row) => {
-  const email = row.Emails.split('\n')[0]
-  const data = { ...row, email }
-  const html = renderData(EMAIL_TEMPLATE, data)
-  console.log(html)
-  // const sanitized = sanitizeFilename(row.name)
-  // fs.writeFileSync(`emails/${sanitized}.html`, finalHtml)
-})
+console.log(
+  `\n ✅ ${htmls.length} files generated successfully under "${folder}"`
+)
