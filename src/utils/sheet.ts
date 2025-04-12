@@ -6,6 +6,7 @@ export type ColumnName =
   | 'url'
   | 'contact'
   | 'emails'
+  | 'email'
   | 'phones'
   | 'language'
 
@@ -15,6 +16,7 @@ export type Row = {
   url: string
   contact: string
   emails: string[]
+  email: string
   phones: string[]
   language: string
 }
@@ -25,6 +27,7 @@ export type AoaRow = [
   Row['url'],
   Row['contact'],
   Row['emails'],
+  Row['email'],
   Row['phones'],
   Row['language'],
 ]
@@ -112,6 +115,8 @@ export class Sheet {
     const data = await processorFn(url)
     this.updateCell(row, 'contact', data.contact)
     this.updateCell(row, 'emails', data.emails)
+    this.updateCell(row, 'email', data.emails?.[0])
+    this.updateCell(row, 'language', data.language)
     this.updateCell(row, 'phones', data.phones)
     this.updateCell(row, 'skip?', 'TRUE')
     return row
