@@ -5,9 +5,7 @@ import type { Row } from './sheet.ts'
 
 type ScrapeResult = { text: string; language: string }
 
-export async function getOrgaData(
-  orgUrl: string
-): Promise<Partial<Row>> {
+export async function getOrgaData(orgUrl: string): Promise<Partial<Row>> {
   const contactPageUrls = await getContactPageUrls(orgUrl)
   const contactPageUrl = contactPageUrls[0] || orgUrl
   const { text, language } = await scrape(contactPageUrl)
