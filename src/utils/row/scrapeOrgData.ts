@@ -1,16 +1,22 @@
-import axios from 'axios'
+import type { Row } from '../../types.ts'
 import * as cheerio from 'cheerio'
-import config from '../../config.ts'
-import type { Row } from './sheet.ts'
+import axios from 'axios'
+import config from '../../../config.ts'
 
 type ScrapeResult = { text: string; language: string }
 
-export async function getOrgaData(orgUrl: string): Promise<Partial<Row>> {
-  const contactPageUrls = await getContactPageUrls(orgUrl)
-  const contactPageUrl = contactPageUrls[0] || orgUrl
-  const { text, language } = await scrape(contactPageUrl)
+export async function scrapeOrgData(row: Row): Promise<Row> {
+  const { url } = row
+  const contactPageUrls = await getContactPageUrls(url)
+  const contact = contactPageUrls[0] || url
+  const { text, language } = await scrape(contact)
   const { emails, phones } = extractEmailsAndPhones(text)
-  return { contact: contactPageUrl, emails, phones, language }
+  row.contact = contact
+  row.emails = emails.join('\n')
+  row.email = emails[0]
+  row.phones = phones.join('\n')
+  row.language = language
+  return row
 }
 
 async function scrape(url: string): Promise<ScrapeResult> {
