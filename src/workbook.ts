@@ -2,7 +2,9 @@ import xlsx from 'xlsx'
 import type { Row } from './types.ts'
 import { appendProccessedBy } from './utils/row/appendProccessedBy.ts'
 
-export type Processor = (row: Row, i: number) => Promise<Row>
+export type Sheet = xlsx.Sheet
+export type SheetProcessor = (sheet: Row[]) => Promise<string[]>
+export type RowProcessor = (row: Row, i: number) => Promise<Row>
 
 export default class Workbook {
   public path: string
@@ -24,7 +26,7 @@ export default class Workbook {
   }
 
   async processEachRowWith(
-    processor: Processor,
+    processor: RowProcessor,
     options = { skippable: true }
   ) {
     console.log('\n🤖', processor.name)
@@ -46,6 +48,11 @@ export default class Workbook {
     )
 
     xlsx.utils.sheet_add_json(this.sheet, processed)
+  }
+
+  async processSheetWith(processor: SheetProcessor) {
+    const processed = processor(this.json)
+    return processed
   }
 
   save(path: string = this.path) {
