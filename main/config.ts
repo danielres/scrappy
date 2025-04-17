@@ -1,4 +1,5 @@
 export default {
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   TEMPLATES_DIR: 'main/templates/',
   EMAIL_TEMPLATE: 'email.md',
   XLSX_IN: 'main/organizations.xlsx',
