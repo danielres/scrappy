@@ -1,6 +1,6 @@
 import config from '../config.ts'
-import row from './utils/row.ts'
-import Workbook from './Workbook.ts'
+import row from '../src/utils/row.ts'
+import Workbook from '../src/workbook.ts'
 
 const wb = new Workbook(config.XLSX_IN)
 

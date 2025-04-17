@@ -1,7 +1,8 @@
 export default {
+  TEMPLATES_DIR: 'main/templates/',
   EMAIL_TEMPLATE: 'email.md',
-  XLSX_IN: 'organizations.xlsx',
-  XLSX_OUT: 'organizations_result.xlsx',
+  XLSX_IN: 'main/organizations.xlsx',
+  XLSX_OUT: 'main/organizations_result.xlsx',
   CONTACT_PAGE_NAMES: [
     'contact',
     'about',

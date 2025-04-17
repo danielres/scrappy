@@ -1,8 +1,11 @@
-import type { Row } from '../types'
 import Handlebars from 'handlebars'
 import MarkdownIt from 'markdown-it'
 import fs from 'fs'
 import juice from 'juice'
+import path from 'path'
+
+import type { Row } from '../types.ts'
+import config from '../../config.ts'
 
 export function dataToHtml(templateName: string, data: Row, css = '') {
   const md = applyTemplate(templateName, data)
@@ -16,7 +19,8 @@ export function inlineStyles(html: string, css: string) {
 }
 
 export function applyTemplate(templateName: string, data: Row): string {
-  const templateSrc = fs.readFileSync(`templates/${templateName}`, 'utf-8')
+  const templatePath = path.join(config.TEMPLATES_DIR, templateName)
+  const templateSrc = fs.readFileSync(templatePath, 'utf-8')
   return Handlebars.compile(templateSrc)(data)
 }
 

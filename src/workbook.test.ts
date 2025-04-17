@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert'
-import Wb, { Processor } from './Workbook.ts'
+import Wb, { type Processor } from './workbook.ts'
 
 const processor: Processor = async (row, i) => {
   return {
