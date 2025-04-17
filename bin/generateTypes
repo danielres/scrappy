@@ -1,0 +1,9 @@
+#!env node
+
+import config from '../config.ts'
+import { generateTypes } from '../src/utils/dev.ts'
+import Workbook from '../src/Workbook.ts'
+
+const wb = new Workbook(config.XLSX_IN)
+
+generateTypes(wb)
