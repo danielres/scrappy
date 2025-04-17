@@ -1,5 +1,4 @@
 import xlsx from 'xlsx'
-import fs from 'fs'
 import type { Row } from './types.ts'
 import { appendProccessedBy } from './utils/row/appendProccessedBy.ts'
 
