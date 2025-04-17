@@ -1,6 +1,6 @@
 import fs from 'fs'
 import xlsx from 'xlsx'
-import Workbook from '../Workbook.ts'
+import Workbook from '../workbook.ts'
 
 export function generateTypes(wb: Workbook) {
   const path = 'src/types.ts'
