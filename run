@@ -1,4 +1,0 @@
-#!/bin/bash
-
-node --no-warnings src/extractor.ts &&
-  node --no-warnings src/templater.ts
