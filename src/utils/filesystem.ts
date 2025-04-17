@@ -1,6 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-import { getFileBasename } from './string.ts'
 
 export type FileObject = {
   name: string
@@ -39,4 +38,24 @@ export function fileExists(filePath: string): boolean {
     console.error('Error checking file existence:', error)
     return false
   }
+}
+
+export function sanitizeFullPath(fp: string) {
+  const parts = fp.split('/')
+  const path = parts.slice(0, -1).join('/') + '/'
+  const fileName = parts[parts.length - 1]
+  const sanitizedFileName = sanitizeFileName(fileName)
+  return path + sanitizedFileName
+}
+
+function sanitizeFileName(str: string) {
+  return str
+    .trim()
+    .normalize('NFD') // Normalize to decompose diacritics
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritic marks
+    .replace(/[^a-zA-Z0-9 ._-]/g, '') // Keep only filename-safe characters
+}
+
+function getFileBasename(pathStr: string) {
+  return path.basename(pathStr)
 }
