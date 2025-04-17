@@ -1,6 +1,6 @@
 #!env node
 
-import config from '../config.ts'
+import config from '../main/config.ts'
 import { generateTypes } from '../src/utils/dev.ts'
 import Workbook from '../src/workbook.ts'
 

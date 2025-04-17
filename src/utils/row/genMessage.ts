@@ -1,6 +1,6 @@
 import type { Row } from '../../types.ts'
-import config from '../../../config.ts'
 import { dataToHtml } from '../../utils/transformers.ts'
+import config from '../../../main/config.ts'
 
 export async function genMessage(row: Row): Promise<Row> {
   const template = config.EMAIL_TEMPLATE

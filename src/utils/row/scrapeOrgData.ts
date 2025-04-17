@@ -1,7 +1,7 @@
 import type { Row } from '../../types.ts'
 import * as cheerio from 'cheerio'
 import axios from 'axios'
-import config from '../../../config.ts'
+import config from '../../../main/config.ts'
 
 type ScrapeResult = { text: string; language: string }
 

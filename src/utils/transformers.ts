@@ -5,7 +5,7 @@ import juice from 'juice'
 import path from 'path'
 
 import type { Row } from '../types.ts'
-import config from '../../config.ts'
+import config from '../../main/config.ts'
 
 export function dataToHtml(templateName: string, data: Row, css = '') {
   const md = applyTemplate(templateName, data)
