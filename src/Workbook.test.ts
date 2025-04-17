@@ -14,7 +14,7 @@ test('Workbook', async (t) => {
     'wb.process() processes each row with provided processor',
     async () => {
       const wb = new Wb('test/test_sheet.xlsx')
-      await wb.process(processor)
+      await wb.processEachRowWith(processor)
 
       assert.deepEqual(wb.json, [
         { name: 'name1', url: 'https://one.example.pl', message: 'POPO 0' },
