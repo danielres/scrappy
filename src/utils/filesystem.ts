@@ -31,3 +31,12 @@ export function loadFileObject(filePath: string): FileObject {
     body: template,
   }
 }
+
+export function fileExists(filePath: string): boolean {
+  try {
+    return fs.existsSync(filePath)
+  } catch (error) {
+    console.error('Error checking file existence:', error)
+    return false
+  }
+}

@@ -11,24 +11,33 @@ type TranslatedTemplateObject = FileObject & {
   language: string
 }
 
-// TODO: make skippable
-export async function translateFor(wb: Workbook) {
+export async function translateFor(
+  wb: Workbook,
+  options = { skippable: true }
+) {
   const languages = await sheet.getLanguages(wb.json)
+
+  console.log('\n🤖', 'templates:', 'translate to:', languages.join(', '))
   const originaTemplatePaths = filesystem.getDirFilePaths(
     config.TEMPLATES_DIR,
     '.md'
   )
   const originalTemplates = filesystem.loadFileObjects(originaTemplatePaths)
-  const translatedTemplates = translateTemplates(originalTemplates, languages)
-  await writeAllTranslations(await translatedTemplates)
+  const translatedTemplates = translateTemplates(
+    originalTemplates,
+    languages,
+    options
+  )
+  await writeAllTranslations(await translatedTemplates, options)
 }
 
 async function translateTemplates(
   originalTemplates: FileObject[],
-  languages: string[]
+  languages: string[],
+  options = { skippable: true }
 ): Promise<TranslatedTemplateObject[]> {
   const promises = originalTemplates.map((template) =>
-    translateTemplate(template, languages)
+    translateTemplate(template, languages, options)
   )
   const resolved = await Promise.all(promises)
   return resolved.flat()
@@ -36,7 +45,8 @@ async function translateTemplates(
 
 async function translateTemplate(
   template: FileObject,
-  languages: string[]
+  languages: string[],
+  options = { skippable: true }
 ): Promise<TranslatedTemplateObject[]> {
   const promises = languages.map(async (language) => {
     const newPath = path.join(
@@ -45,10 +55,19 @@ async function translateTemplate(
       language,
       template.name
     )
+    const skip = filesystem.fileExists(template.path) && options.skippable
+
+    if (skip) {
+      const fileObject = filesystem.loadFileObject(template.path)
+      console.log('  ⏩', newPath)
+      return { ...fileObject, language }
+    }
+
     const getBody = async () => {
       if (language === 'en') return template.body
       return await translator.openAi(template.body, language)
     }
+
     return {
       ...template,
       path: newPath,
@@ -59,14 +78,22 @@ async function translateTemplate(
   return Promise.all(promises)
 }
 
-export async function writeAllTranslations(ts: TranslatedTemplateObject[]) {
-  const promises = ts.map(writeTranslation)
+async function writeAllTranslations(
+  ts: TranslatedTemplateObject[],
+  options = { skippable: true }
+) {
+  const promises = ts.map((t) => writeTranslation(t, options))
   return await Promise.all(promises)
 }
 
-async function writeTranslation(translation: TranslatedTemplateObject) {
+async function writeTranslation(
+  translation: TranslatedTemplateObject,
+  options = { skippable: true }
+) {
+  const skip = filesystem.fileExists(translation.path) && options.skippable
+  if (skip) return
   const dir = path.dirname(translation.path)
   await fs.mkdir(dir, { recursive: true })
   await fs.writeFile(translation.path, translation.body, 'utf8')
-  console.log('💾', translation.path)
+  console.log('  💾', translation.path)
 }
