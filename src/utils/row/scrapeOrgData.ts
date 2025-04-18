@@ -37,7 +37,9 @@ async function getContactPageUrls(baseUrl: string) {
   try {
     const response = await axios.get(baseUrl, { timeout: 10000 })
     const $ = cheerio.load(response.data)
-    const stringsToSearch = config.CONTACT_PAGE_NAMES
+    const stringsToSearch = config.CONTACT_PAGE_NAMES.split(',').map((s) =>
+      s.trim()
+    )
 
     const links = $('a[href]')
       .map((_, el) => $(el).attr('href'))
