@@ -8,7 +8,7 @@ export async function openAi(str: string, language: string): Promise<string> {
 
   const response = await openai.responses.create({
     model: config.OPENAI_MODEL,
-    instructions: `Translate the following text to ${language}`,
+    instructions: `Translate the following text 'as is' to ${language}`,
     input: str,
     text: { format: { type: 'text' } },
     reasoning: {},
