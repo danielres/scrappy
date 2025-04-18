@@ -23,7 +23,8 @@ async function scrape(url: string): Promise<ScrapeResult> {
   try {
     const response = await axios.get(url, { timeout: 10000 })
     const $ = cheerio.load(response.data)
-    const language = $('html').attr('lang') || 'unknown'
+    const locale = $('html').attr('lang') || ''
+    const language = locale.split('-')[0] || 'en'
     $('script, style').remove()
     const text = $('body').text().replace(/\s+/g, ' ').trim()
     return { text, language }
