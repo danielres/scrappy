@@ -55,7 +55,7 @@ async function translateTemplate(
       language,
       template.name
     )
-    const skip = filesystem.fileExists(template.path) && options.skippable
+    const skip = filesystem.fileExists(newPath) && options.skippable
 
     if (skip) {
       const fileObject = filesystem.loadFileObject(template.path)
