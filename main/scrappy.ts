@@ -3,7 +3,7 @@ import row from '../src/utils/row.ts'
 import config from './config.ts'
 import * as templates from '../src/utils/templates.ts'
 
-const wb = new Workbook(config.XLSX_OUT)
+const wb = new Workbook(config.XLSX_IN)
 
 await wb.processEachRowWith(row.scrapeOrgData, { skippable: true })
 await templates.translateFor(wb, { skippable: true })
